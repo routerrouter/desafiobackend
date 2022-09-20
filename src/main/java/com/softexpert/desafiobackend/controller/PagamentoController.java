@@ -7,6 +7,7 @@ import com.softexpert.desafiobackend.model.dto.NovoEstadoPagamento;
 import com.softexpert.desafiobackend.model.dto.PagamentoGerado;
 import com.softexpert.desafiobackend.model.form.PagamentoForm;
 import com.softexpert.desafiobackend.model.form.StatusMudadancaForm;
+import com.softexpert.desafiobackend.services.PagamentoStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -17,11 +18,14 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/pagamento")
+@RequestMapping("/softexpert/pagamento")
 public class PagamentoController {
 	
 	@Autowired
 	private SimpMessagingTemplate message;
+
+	@Autowired
+	PagamentoStrategy pagamentoStrategy;
 	
 	@Value("${picpay.url-generate-payment}")
 	private String urlGeneratePayment;
@@ -43,8 +47,9 @@ public class PagamentoController {
 	
 	@Value("${picpay.x-seller-token}")
 	private String sellerToken;
+
 	
-	@PostMapping(value = {"", "/"})
+	@PostMapping()
 	public ResponseEntity<PagamentoGerado> gerarPagamento(@Valid @RequestBody PagamentoForm form) throws Exception {
 		Pagamento pagamento = form.pagamento(callbackUrl, returnUrl, minutesForExpirationPayment);
 		
@@ -53,8 +58,9 @@ public class PagamentoController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add("x-picpay-token", picpayToken);
+
 		
-		HttpEntity<Pagamento> entity = new HttpEntity<Pagamento>(pagamento, headers);
+		HttpEntity<Pagamento> entity = new HttpEntity<Pagamento>(pagamentoStrategy.pagar(pagamento), headers);
 		
 		try {
 			ResponseEntity<String> response = restTemplate.postForEntity(urlGeneratePayment, entity, String.class);

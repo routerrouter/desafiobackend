@@ -1,12 +1,14 @@
 package com.softexpert.desafiobackend.services.impl;
 
 import com.softexpert.desafiobackend.model.Pagamento;
-import com.softexpert.desafiobackend.services.PagamentoService;
+import com.softexpert.desafiobackend.services.PagamentoStrategy;
+import org.springframework.stereotype.Service;
 
-public class PagamentoPicPay  implements PagamentoService {
+@Service
+public class PagamentoPicPay  implements PagamentoStrategy {
+
     @Override
-    public Pagamento pagar(String callbackUrl, String returnUrl, Integer minutesForExpiration) {
-        System.out.println("Pagou pelo PicPay");
-        return null;
+    public Pagamento pagar(Pagamento pagamento) {
+       return  pagamento.processarPagamento(this::pagar);
     }
 }

@@ -1,9 +1,8 @@
 package com.softexpert.desafiobackend.model;
 
+import com.softexpert.desafiobackend.services.PagamentoStrategy;
 import lombok.Data;
-import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -37,6 +36,10 @@ public class Pagamento {
         builder.append(this.consumidor.getValorPagar() + "\n");
 
         return builder.toString();
+    }
+
+    public Pagamento processarPagamento(PagamentoStrategy  pagamentoStrategy) {
+        return pagamentoStrategy.pagar(this);
     }
 
 }

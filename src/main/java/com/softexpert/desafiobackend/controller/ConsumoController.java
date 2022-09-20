@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/softexpert/conta")
 @CrossOrigin(origins = "*", maxAge = 3600)
-public class ContaController {
+public class ConsumoController {
 
     @Autowired
     ConsumoService contaService;
@@ -32,11 +32,11 @@ public class ContaController {
         List<Consumidor> consumos = contaService.calcularTotalPagar(contaDto);
         pessoasConsumidoras = consumos;
         for ( Consumidor pessoa : consumos) {
-            Link selfLink = linkTo(methodOn(ContaController.class)
+            Link selfLink = linkTo(methodOn(ConsumoController.class)
                   .getContaIndividual(pessoa.getNome())).withSelfRel();
             pessoa.add(selfLink);
         }
-        Link link = linkTo(ContaController.class).withSelfRel();
+        Link link = linkTo(ConsumoController.class).withSelfRel();
         CollectionModel<Consumidor> result = CollectionModel.of(consumos, link);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
