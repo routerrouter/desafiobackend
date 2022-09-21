@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Consumidor extends RepresentationModel <Consumidor> {
+public class Consumer extends RepresentationModel <Consumer> {
 
     private String nome;
     private String email;
@@ -22,7 +22,7 @@ public class Consumidor extends RepresentationModel <Consumidor> {
 
 
 
-    public Consumidor(String nome , BigDecimal consumo) {
+    public Consumer(String nome , BigDecimal consumo) {
         this.nome = nome;
         this.valorConsumido = consumo;
     }

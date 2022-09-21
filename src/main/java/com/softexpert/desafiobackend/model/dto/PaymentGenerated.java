@@ -4,14 +4,14 @@ import lombok.Data;
 import org.json.JSONObject;
 
 @Data
-public class PagamentoGerado {
+public class PaymentGenerated {
 	
 	private String referenceId;
 	private String expiresAt;
 	private String qrCode;
 	private String statusPayment;
 
-	public PagamentoGerado(String jsonStr) {
+	public PaymentGenerated(String jsonStr) {
 		JSONObject json = new JSONObject(jsonStr);
 		this.referenceId = json.getString("referenceId");
 		this.expiresAt = json.getString("expiresAt");

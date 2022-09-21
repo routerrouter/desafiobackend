@@ -2,12 +2,13 @@ package com.softexpert.desafiobackend.controller;
 
 import com.softexpert.desafiobackend.controller.exception.PaymentRequestException;
 import com.softexpert.desafiobackend.controller.exception.StatusChangeException;
-import com.softexpert.desafiobackend.model.Pagamento;
+import com.softexpert.desafiobackend.model.Payment;
 import com.softexpert.desafiobackend.model.dto.NovoEstadoPagamento;
-import com.softexpert.desafiobackend.model.dto.PagamentoGerado;
-import com.softexpert.desafiobackend.model.form.PagamentoForm;
+import com.softexpert.desafiobackend.model.dto.PaymentGenerated;
+import com.softexpert.desafiobackend.model.form.PicPayPaymentForm;
 import com.softexpert.desafiobackend.model.form.StatusMudadancaForm;
-import com.softexpert.desafiobackend.services.PagamentoStrategy;
+import com.softexpert.desafiobackend.strategy.PaymentStrategy;
+import com.softexpert.desafiobackend.strategy.impl.PicPayPayment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -18,14 +19,14 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/softexpert/pagamento")
-public class PagamentoController {
+@RequestMapping("/softexpert/payment")
+public class PaymentController {
 	
 	@Autowired
 	private SimpMessagingTemplate message;
 
 	@Autowired
-	PagamentoStrategy pagamentoStrategy;
+	PaymentStrategy paymentStrategy;
 	
 	@Value("${picpay.url-generate-payment}")
 	private String urlGeneratePayment;
@@ -50,8 +51,8 @@ public class PagamentoController {
 
 	
 	@PostMapping()
-	public ResponseEntity<PagamentoGerado> gerarPagamento(@Valid @RequestBody PagamentoForm form) throws Exception {
-		Pagamento pagamento = form.pagamento(callbackUrl, returnUrl, minutesForExpirationPayment);
+	public ResponseEntity<PaymentGenerated> generatePaymentPicPay(@Valid @RequestBody PicPayPaymentForm form) throws Exception {
+		Payment payment = form.pay(callbackUrl, returnUrl, minutesForExpirationPayment);
 		
 		RestTemplate restTemplate = new RestTemplate();
 		
@@ -59,12 +60,11 @@ public class PagamentoController {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.add("x-picpay-token", picpayToken);
 
-		
-		HttpEntity<Pagamento> entity = new HttpEntity<Pagamento>(pagamentoStrategy.pagar(pagamento), headers);
+		HttpEntity<Payment> entity = new HttpEntity<Payment>(payment, headers);
 		
 		try {
 			ResponseEntity<String> response = restTemplate.postForEntity(urlGeneratePayment, entity, String.class);
-			return ResponseEntity.ok(new PagamentoGerado(response.getBody()));
+			return ResponseEntity.ok(new PaymentGenerated(response.getBody()));
 		} catch (Exception ex) {
 			throw new PaymentRequestException(ex.getMessage());
 		}

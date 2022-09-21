@@ -1,21 +1,21 @@
 package com.softexpert.desafiobackend.model;
 
-import com.softexpert.desafiobackend.services.PagamentoStrategy;
+import com.softexpert.desafiobackend.strategy.PaymentStrategy;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Data
-public class Pagamento {
+public class Payment {
 
+    private Consumer consumer;
+    private String expiresAt;
     private String referenceId;
     private String callbackUrl;
     private String returnUrl;
-    private String expiresAt;
-    private Consumidor consumidor;
 
-    public Pagamento(Integer minutesForExpiration) {
+    public Payment(Integer minutesForExpiration) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
         this.expiresAt = ZonedDateTime.now().plusMinutes(minutesForExpiration).format(formatter);
     }
@@ -24,22 +24,23 @@ public class Pagamento {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
+        builder.append(this.expiresAt + "\n");
         builder.append(this.referenceId + "\n");
         builder.append(this.callbackUrl + "\n");
         builder.append(this.returnUrl + "\n");
         builder.append(this.expiresAt + "\n");
 
-        builder.append(this.consumidor.getNome() + "\n");
-        builder.append(this.consumidor.getCelular() + "\n");
-        builder.append(this.consumidor.getEmail() + "\n");
-        builder.append(this.consumidor.getValorConsumido() + "\n");
-        builder.append(this.consumidor.getValorPagar() + "\n");
+        builder.append(this.consumer.getNome() + "\n");
+        builder.append(this.consumer.getCelular() + "\n");
+        builder.append(this.consumer.getEmail() + "\n");
+        builder.append(this.consumer.getValorConsumido() + "\n");
+        builder.append(this.consumer.getValorPagar() + "\n");
 
         return builder.toString();
     }
 
-    public Pagamento processarPagamento(PagamentoStrategy  pagamentoStrategy) {
-        return pagamentoStrategy.pagar(this);
+    public Payment processPayment(PaymentStrategy paymentMethod) {
+        return paymentMethod.pay(this);
     }
 
 }
